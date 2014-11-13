@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.uml.twitterbullinganalysis;
+package com.uml.TwitterBullingAnalysis;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -119,12 +120,19 @@ public class TwitterBullingAnalysisMain {
 	}
 
 	public static void main(String[] args) throws IOException {
-		if (args.length < 1) {
-			System.err.println("Usage: java SentiWordNetDemoCode <pathToSentiWordNetFile>");
-			return;
-		}
+//		if (args.length < 1) {
+//			System.err.println("Usage: java SentiWordNetDemoCode <pathToSentiWordNetFile>");
+//			return;
+//		}
 
-		String pathToSWN = args[0];
+		String pathToSWN = new File("").getAbsolutePath();
+		//chop off ending
+		String[] split = pathToSWN.split("TwitterBullyingAnalysis");
+		pathToSWN = split[0];
+		//add path to senti word net corpus
+		pathToSWN = pathToSWN.concat("SentiWordCorpus/SentiWordNet_3.0.0_20130122.txt");
+		System.out.println(pathToSWN);
+
 		TwitterBullingAnalysisMain sentiwordnet = new TwitterBullingAnalysisMain(pathToSWN);
 
 		System.out.println("good#a " + sentiwordnet.extract("good", "a"));
