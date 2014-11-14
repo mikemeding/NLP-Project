@@ -11,6 +11,11 @@
             <artifactId>twitter4j-core</artifactId>
             <version>4.0.2</version>
         </dependency>
+        <dependency>
+        	<groupId>edu.cmu.cs</groupId>
+        	<artifactId>ark-tweet-nlp</artifactId>
+        	<version>0.3.2</version>
+        </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
