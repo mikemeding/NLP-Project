@@ -23,32 +23,45 @@ import twitter4j.TwitterFactory;
 public class TwitterConsumer {
 
 	/**
-	 * FYI!!!!!!!!!!!!!!!!!!!!!! Requests to twitter are rate limited. Only 15 requests per registered app every 15 minutes.
+	 * FYI!!!!!!!!!!!!!!!!!!!!!! Requests to twitter are rate limited. Only 15
+	 * requests per registered app every 15 minutes.
 	 */
 	public static void main(String[] args) {
+		Twitter twitter = new TwitterFactory().getInstance(); // Huge...
+
 		//TODO: we should be thinking of antagonistic tweet searches to build our corpus
-		String queryTerm = "#noob";
+		String[] queryTerms = {"#WTF", "#noob", "#sucks", "#crappy", "#shit"}; // generally negative sentiment.
 
 		// creates a relative file path into Corpus folder to store data
 		String pathToCorpus = new File("").getAbsolutePath();
 		String[] split = pathToCorpus.split("TwitterBullyingAnalysis");
 		pathToCorpus = split[0];
-		pathToCorpus = pathToCorpus.concat("/Corpus/" + queryTerm + ".txt");
+		pathToCorpus = pathToCorpus.concat("/Corpus/" + "negativeTweets" + ".txt");
 		System.out.println(pathToCorpus);
 
-		Twitter twitter = new TwitterFactory().getInstance();
-		try {
-			// query and save to file 
-			queryTwitter(queryTerm, twitter, pathToCorpus);
-			System.exit(0);
-		} catch (TwitterException te) {
-			te.printStackTrace();
-			System.out.println("Failed to search tweets: " + te.getMessage());
-			System.exit(-1);
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			System.err.println("Corpus write failure");
-			System.exit(-1);
+		for (String queryTerm : queryTerms) {
+			try {
+				// query and save to file 
+				queryTwitter(queryTerm, twitter, pathToCorpus);
+			} catch (TwitterException te) {
+				try {
+					int resetTime = te.getRateLimitStatus().getSecondsUntilReset();
+
+					while (resetTime > 0) {
+						Thread.sleep(1000); // 1 second stop
+						System.out.println("Time till reset: ");
+						--resetTime;
+					}
+				} catch (InterruptedException ie) {
+					ie.printStackTrace();
+					System.exit(-1);
+				}
+
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+				System.err.println("Corpus write failure");
+				System.exit(-1);
+			}
 		}
 	}
 
@@ -62,6 +75,7 @@ public class TwitterConsumer {
 	 */
 	public static void queryTwitter(String searchTerm, Twitter twitter, String filePath) throws TwitterException, IOException {
 		Query query = new Query(searchTerm);
+		query.setLang("en"); // we only want english tweets
 		QueryResult result;
 		do {
 			result = twitter.search(query);
