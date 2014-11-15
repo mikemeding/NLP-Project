@@ -43,13 +43,14 @@ public class TwitterConsumer {
 			try {
 				// query and save to file 
 				queryTwitter(queryTerm, twitter, pathToCorpus);
-			} catch (TwitterException te) {
+			} catch (TwitterException te) { // if we encounter an error with twitter
 				try {
+					// Not really checking for anything else but it is likely that we are out of requests
 					int resetTime = te.getRateLimitStatus().getSecondsUntilReset();
 
 					while (resetTime > 0) {
 						Thread.sleep(1000); // 1 second stop
-						System.out.println("Time till reset: ");
+						System.out.println("seconds till reset: " + resetTime);
 						--resetTime;
 					}
 				} catch (InterruptedException ie) {
