@@ -4,32 +4,38 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SentiWordNet {
-
-    public static void main(String[] args) throws Exception {
-        new SentiWordNet("files/SentiWordNet_3.0.0_20130122.txt");
-    }
     
     private Map<String, Map<String, List<SentiWordNetEntry>>> posMap;
+    private Set<String> wordSet;
     
     public SentiWordNet(String fileName) throws IOException {
         posMap = new HashMap<>();
+        wordSet = new HashSet<>();
         readFile(fileName);
     }
     
+    public boolean containsWord(String word) {
+        return wordSet.contains(word);
+    }
+    
+    @SuppressWarnings("unchecked")
     public List<SentiWordNetEntry> getSentiWordNetEntries(String tag, String word) {
         
         Map<String, List<SentiWordNetEntry>> wordMap = posMap.get(tag);
         
-        if(wordMap != null) {
+        if(wordMap != null && wordMap.get(word) != null) {
             return wordMap.get(word);
         }
         
-        return null;
+        return Collections.EMPTY_LIST;
     }
     
     private void readFile(String fileName) throws IOException {
@@ -60,10 +66,7 @@ public class SentiWordNet {
             String synsetTerms = fields[4];
             String gloss = fields[5];
             
-            String[] splitTerms = synsetTerms.split(" ");
-            
-            
-            SentiWordNetEntry entry = new SentiWordNetEntry(pos, id, positiveScore, negativeScore, synsetTerms, gloss, splitTerms);
+            SentiWordNetEntry entry = new SentiWordNetEntry(pos, id, positiveScore, negativeScore, synsetTerms, gloss);
             addToMap(entry);
         }
         
@@ -80,8 +83,9 @@ public class SentiWordNet {
             posMap.put(entry.getPos(), wordMap);
         }
         
-        for(String word: entry.getSplitTerms()) {
+        for(String word: entry.getSynsetTerms().split(" ")) {
             word = word.substring(0, word.length() - 2);
+            wordSet.add(word);
             
             List<SentiWordNetEntry> entries = wordMap.get(word);
             if(entries == null) {

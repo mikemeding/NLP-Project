@@ -7,21 +7,20 @@ public class SentiWordNetEntry {
     
     private double positiveScore;
     private double negativeScore;
+    private double objectiveScore;
     
     private String synsetTerms;
     private String gloss;
     
-    private String[] splitTerms;
-
     public SentiWordNetEntry(String pos, int id, double positiveScore, double negativeScore,
-            String synsetTerms, String gloss, String[] splitTerms) {
+            String synsetTerms, String gloss) {
         this.pos = pos;
         this.id = id;
         this.positiveScore = positiveScore;
         this.negativeScore = negativeScore;
+        this.objectiveScore = 1.0 - positiveScore - negativeScore;
         this.synsetTerms = synsetTerms;
         this.gloss = gloss;
-        this.splitTerms = splitTerms;
     }
 
     public String getPos() {
@@ -36,6 +35,10 @@ public class SentiWordNetEntry {
         return positiveScore;
     }
 
+    public double getObjectiveScore() {
+        return objectiveScore;
+    }
+
     public double getNegativeScore() {
         return negativeScore;
     }
@@ -48,14 +51,10 @@ public class SentiWordNetEntry {
         return gloss;
     }
 
-    public String[] getSplitTerms() {
-        return splitTerms;
-    }
-
     @Override
     public String toString() {
         return "SentiWordNetEntry [pos=" + pos + ", id=" + id + ", positiveScore=" + positiveScore
-                + ", negativeScore=" + negativeScore + ", synsetTerms=" + synsetTerms + ", gloss="
-                + gloss + "]";
+                + ", negativeScore=" + negativeScore + ", objectiveScore=" + objectiveScore
+                + ", synsetTerms=" + synsetTerms + ", gloss=" + gloss + "]";
     }
 }
