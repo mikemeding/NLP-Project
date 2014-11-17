@@ -26,7 +26,7 @@ import twitter4j.TwitterFactory;
 public class TwitterConsumer {
 
 	//TODO: we should be thinking of antagonistic tweet searches to build our corpus
-	static String[] queryTerms = {"#WTF", "#noob", "#sucks", "#crappy", "#shit", "#ego", "#immature"}; 
+	static String[] queryTerms = {"#WTF", "#noob", "#sucks", "#crappy", "#shit", "#ego", "#immature"};
 
 	/**
 	 * FYI!!!!!!!!!!!!!!!!!!!!!! Requests to twitter are rate limited. Only 15
@@ -35,13 +35,13 @@ public class TwitterConsumer {
 	public static void main(String[] args) {
 		Twitter twitter = new TwitterFactory().getInstance(); // Huge...
 
-//		for (String queryTerm : queryTerms) {
+		for (String queryTerm : queryTerms) {
 			try {
-				String pathToCorpus = getPathToCorpus(); 
-				pathToCorpus = pathToCorpus.concat("user.txt");
-				
+				String pathToCorpus = getPathToCorpus();
+				pathToCorpus = pathToCorpus.concat("negative-tweets-annotated.txt");
+
 				// query and save to file 
-				queryTwitterUser("ActuallyNPH", twitter, pathToCorpus);
+				queryTwitter(queryTerm, twitter, pathToCorpus);
 
 			} catch (TwitterException te) { // if we encounter an error with twitter
 				try {
@@ -64,7 +64,7 @@ public class TwitterConsumer {
 				System.exit(-1);
 			}
 
-//		}
+		}
 	}
 
 	/**
@@ -84,6 +84,8 @@ public class TwitterConsumer {
 		query.setSince(date);// since january last year
 		QueryResult result;
 
+		int queryCount = 0;
+
 		do {
 			result = twitter.search(query);
 			List<Status> tweets = result.getTweets();
@@ -91,6 +93,14 @@ public class TwitterConsumer {
 				System.out.println("@" + tweet.getUser().getScreenName() + "\t" + tweet.getText());
 			}
 			saveResults(tweets, filePath);
+
+			// we only want 5 quires for now
+			if (queryCount > 5) {
+				queryCount = 0;
+				break;
+			} else {
+				queryCount++;
+			}
 
 		} while ((query = result.nextQuery()) != null); // for all pages of this occuring (CAN BE A LOT)	
 	}
@@ -115,7 +125,7 @@ public class TwitterConsumer {
 			List<Status> usableTweets = new ArrayList<>();
 			for (Status tweet : tweets) {
 				if (tweet.getUser().getScreenName().equals(searchUser)) {
-					
+
 					System.out.println("@" + tweet.getUser().getScreenName() + "\t" + tweet.getText());
 					usableTweets.add(tweet);
 				}
