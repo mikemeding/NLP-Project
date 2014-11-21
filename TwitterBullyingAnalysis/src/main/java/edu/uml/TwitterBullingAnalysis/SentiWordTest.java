@@ -20,9 +20,9 @@ public class SentiWordTest {
         SentiWordNetFeatureExtraction featureExtraction = new SentiWordNetFeatureExtraction(tagger,
                 sentiWordNet);
 
-        BufferedReader br = new BufferedReader(new FileReader("../Corpus/#noob.txt-filtered"));
+//        BufferedReader br = new BufferedReader(new FileReader("../Corpus/#noob.txt"));
 //        BufferedReader br = new BufferedReader(new FileReader("../Corpus/negativeTweets.txt-filtered"));
-        // BufferedReader br = new BufferedReader(new FileReader("../Corpus/bullying_tweets.txt"));
+         BufferedReader br = new BufferedReader(new FileReader("../Corpus/bullying_tweets.txt"));
         String line;
         while ((line = br.readLine()) != null) {
 
