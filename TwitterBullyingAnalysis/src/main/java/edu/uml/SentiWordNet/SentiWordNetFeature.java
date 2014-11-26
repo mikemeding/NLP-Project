@@ -45,6 +45,7 @@ public class SentiWordNetFeature {
     }
     
     public double getAveragePositiveScore() {
+        if(wordCount == 0) return 0.0;
         return sumPositiveScore / wordCount;
     }
     
@@ -58,6 +59,7 @@ public class SentiWordNetFeature {
     }
     
     public double getAverageNegativeScore() {
+        if(wordCount == 0) return 0.0;
         return sumNegativeScore / wordCount;
     }
 

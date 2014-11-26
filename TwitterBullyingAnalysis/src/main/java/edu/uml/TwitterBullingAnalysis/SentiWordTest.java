@@ -33,7 +33,7 @@ public class SentiWordTest {
 
             String[] split = line.split("\t");
 
-            if (split.length != 2) continue;
+            if (split.length < 2) continue;
 
             SentiWordNetFeature feature = featureExtraction.extractFeatures(split[1]);
 
