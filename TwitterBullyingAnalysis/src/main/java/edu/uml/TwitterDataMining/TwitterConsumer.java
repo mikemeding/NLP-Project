@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import twitter4j.Query;
 import twitter4j.QueryResult;
+import twitter4j.RateLimitStatus;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -36,33 +37,11 @@ public class TwitterConsumer {
 		Twitter twitter = new TwitterFactory().getInstance(); // Huge...
 
 		for (String queryTerm : queryTerms) {
-			try {
-				String pathToCorpus = getPathToCorpus();
-				pathToCorpus = pathToCorpus.concat("negative-tweets-annotated.txt");
+			String pathToCorpus = getPathToCorpus();
+			pathToCorpus = pathToCorpus.concat(queryTerm + ".txt");
 
-				// query and save to file 
-				queryTwitter(queryTerm, twitter, pathToCorpus);
-
-			} catch (TwitterException te) { // if we encounter an error with twitter
-				try {
-					// Not really checking for anything else but it is likely that we are out of requests
-					int resetTime = te.getRateLimitStatus().getSecondsUntilReset();
-
-					while (resetTime > 0) {
-						Thread.sleep(1000); // 1 second stop
-						System.out.println("seconds till reset: " + resetTime);
-						--resetTime;
-					}
-				} catch (InterruptedException ie) {
-					ie.printStackTrace();
-					System.exit(-1);
-				}
-
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-				System.err.println("Corpus write failure");
-				System.exit(-1);
-			}
+			// query and save to file 
+			queryTwitter(queryTerm, twitter, pathToCorpus);
 
 		}
 	}
@@ -75,7 +54,7 @@ public class TwitterConsumer {
 	 * @param twitter The twitter factory from twitter4j
 	 * @param filePath The fully qualified path to store the data if found
 	 */
-	public static void queryTwitter(String searchTerm, Twitter twitter, String filePath) throws TwitterException, IOException {
+	public static void queryTwitter(String searchTerm, Twitter twitter, String filePath) {
 		Query query = new Query(searchTerm);
 		query.setLang("en"); // we only want english tweets
 		// get and format date to get tweets no more than a year old
@@ -86,23 +65,46 @@ public class TwitterConsumer {
 
 		int queryCount = 0;
 
-		do {
-			result = twitter.search(query);
-			List<Status> tweets = result.getTweets();
-			for (Status tweet : tweets) {
-				System.out.println("@" + tweet.getUser().getScreenName() + "\t" + tweet.getText());
-			}
-			saveResults(tweets, filePath);
+		try {
+			do {
+				result = twitter.search(query);
+				List<Status> tweets = result.getTweets();
+				for (Status tweet : tweets) {
+					System.out.println("@" + tweet.getUser().getScreenName() + "\t" + tweet.getText());
+				}
+				saveResults(tweets, filePath);
 
-			// we only want 5 quires for now
-			if (queryCount > 5) {
-				queryCount = 0;
-				break;
-			} else {
-				queryCount++;
+				// we only want 5 quires for now
+				if (queryCount > 5) {
+					queryCount = 0;
+					break;
+				} else {
+					queryCount++;
+				}
+			} while ((query = result.nextQuery()) != null); // for all pages of this occuring (CAN BE A LOT)	
+
+			// Wait loop for reset
+		} catch (TwitterException te) {
+			try { // try block for sleep thread
+				if (!te.isCausedByNetworkIssue()) {
+					// Not really checking for anything else but it is likely that we are out of requests
+					int resetTime = te.getRateLimitStatus().getSecondsUntilReset();
+
+					while (resetTime > 0) {
+						Thread.sleep(1000); // 1 second stop
+						System.out.println("seconds till reset: " + resetTime);
+						--resetTime;
+					}
+				} else {
+					te.printStackTrace();
+				}
+			} catch (InterruptedException ie) {
+				ie.printStackTrace();
+				System.exit(-1);
 			}
 
-		} while ((query = result.nextQuery()) != null); // for all pages of this occuring (CAN BE A LOT)	
+		}
+
 	}
 
 	/**
@@ -144,7 +146,7 @@ public class TwitterConsumer {
 	 * @param tweets
 	 * @param filePath
 	 */
-	public static void saveResults(List<Status> tweets, String filePath) throws IOException {
+	public static void saveResults(List<Status> tweets, String filePath) {
 		try (FileWriter fw = new FileWriter(filePath, true)) { // try with resources (will close file pointers)
 			for (Status tweet : tweets) {
 				// user filter for checking only their tweets 
@@ -162,7 +164,7 @@ public class TwitterConsumer {
 		String path = new File("").getAbsolutePath();
 		String[] split = path.split("TwitterBullyingAnalysis");
 		path = split[0];
-		path = path.concat("/Corpus/");
+		path = path.concat("/Corpus/Untagged/");
 		return path;
 	}
 
