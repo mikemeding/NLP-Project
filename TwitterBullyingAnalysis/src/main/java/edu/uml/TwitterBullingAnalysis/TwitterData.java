@@ -1,5 +1,7 @@
 package edu.uml.TwitterBullingAnalysis;
 
+import twitter4j.Status;
+
 public class TwitterData {
 
     private String user;
