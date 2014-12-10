@@ -61,8 +61,10 @@ public class MLTest {
 		ArrayList<TwitterData> trainingTweets = new ArrayList<>();
 		ArrayList<TwitterData> testingTweets = new ArrayList<>();
 
+		// Parse all data sets 
 		List<TwitterData> allTweets = new ArrayList<>();
 		allTweets = DataParser.parseData("../Corpus/gold/tweets-annotated-large.txt");
+		allTweets.addAll(DataParser.parseData("../Corpus/gold/tweets-annotated.txt"));
 		splitData(allTweets, trainingTweets, testingTweets);
 
 		// Set up machine learning
@@ -151,7 +153,7 @@ public class MLTest {
 		double precision = (tp / (tp + fp));
 		double recall = (tp / (tp + fn));
 
-		System.out.println(correct + " of " + dataSet.size());
+		System.out.println(correct + " of " + dataSet.size() + " correctly tagged");
 		System.out.println("precision: " + precision);
 		System.out.println("recall: " + recall);
 	}
