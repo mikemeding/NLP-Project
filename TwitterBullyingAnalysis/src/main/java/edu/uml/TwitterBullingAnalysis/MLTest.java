@@ -29,7 +29,8 @@ import edu.uml.SentiWordNet.SentiWordNetFeatureExtraction;
 
 public class MLTest {
 
-	public static final int NUMBER_OF_FEATURES = 23;
+	public static final int NUMBER_OF_FEATURES = 26;
+	public static final int NUMBER_OF_OUTPUTS = 1;
 	public static final double TRAINING_PERCENTAGE = 0.8;
 
 	public static final Random RANDOM = new Random(0);
@@ -63,15 +64,16 @@ public class MLTest {
 
 		// Parse all data sets 
 		List<TwitterData> allTweets = new ArrayList<>();
-		allTweets = DataParser.parseData("../Corpus/gold/tweets-annotated-large.txt");
+//		allTweets.addAll(DataParser.parseData("../Corpus/gold/tweets-annotated-large.txt"));
 		allTweets.addAll(DataParser.parseData("../Corpus/gold/tweets-annotated.txt"));
+		allTweets.addAll(DataParser.parseData("../Corpus/gold/bullying-tweets.txt"));
 		splitData(allTweets, trainingTweets, testingTweets);
 
 		// Set up machine learning
 		BasicMLDataSet trainingData = new BasicMLDataSet();
 		BasicMLDataSet testingData = new BasicMLDataSet();
 
-		// Extact all our features from the given data
+		// Extract all our features from the given data
 		extractFeatures(swnfe, hife, emoticonFeature, trainingTweets, trainingData);
 		extractFeatures(swnfe, hife, emoticonFeature, testingTweets, testingData);
 
@@ -79,8 +81,8 @@ public class MLTest {
 		BasicNetwork network = new BasicNetwork();
 		network.addLayer(new BasicLayer(null, true, NUMBER_OF_FEATURES));
 		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_FEATURES * 2));
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 1));
-//        network.addLayer(new BasicLayer(new ActivationSoftMax(), true, 2));
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_OUTPUTS));
+//        network.addLayer(new BasicLayer(new ActivationSoftMax(), true, NUMBER_OF_OUTPUTS));
 		network.getStructure().finalizeStructure();
 		network.reset();
 		MLRegression mlRegression = network;
@@ -206,44 +208,48 @@ public class MLTest {
 			SentiWordNetFeature sentiWordNetFeature = swnfe.extractFeatures(tweet);
 			HarvardInquirerFeature harvardInquirerFeature = hife.extractFeatures(tweet);
 			double[] feature = new double[NUMBER_OF_FEATURES];
+			int featureIndex = 0;
 
-			feature[0] = sentiWordNetFeature.getAveragePositiveScore();
-			feature[1] = sentiWordNetFeature.getAverageNegativeScore();
+			feature[featureIndex++] = sentiWordNetFeature.getAveragePositiveScore();
+			feature[featureIndex++] = sentiWordNetFeature.getAverageNegativeScore();
+			feature[featureIndex++] = sentiWordNetFeature.getAverageObjectiveScore();
+			
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroAveragePositiveScore();
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroAverageNegativeScore();
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroAverageObjectiveScore();
 
-			feature[2] = sentiWordNetFeature.getNonZeroAveragePositiveScore();
-			feature[3] = sentiWordNetFeature.getNonZeroAverageNegativeScore();
-
-			feature[4] = sentiWordNetFeature.getNonZeroAveragePositiveAdjectiveScore();
-			feature[5] = sentiWordNetFeature.getNonZeroAverageNegativeAdjectiveScore();
-
-			feature[6] = sentiWordNetFeature.getNonZeroNegativeCount() > sentiWordNetFeature
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroAveragePositiveAdjectiveScore();
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroAverageNegativeAdjectiveScore();
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroAverageObjectiveAdjectiveScore();
+			
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroNegativeCount() > sentiWordNetFeature
 					  .getNonZeroPositiveCount() ? 1.0 : 0.0;
-			feature[7] = sentiWordNetFeature.getNonZeroNegativeAdjectiveCount() > sentiWordNetFeature
+			feature[featureIndex++] = sentiWordNetFeature.getNonZeroNegativeAdjectiveCount() > sentiWordNetFeature
 					  .getNonZeroPositiveAdjectiveCount() ? 1.0 : 0.0;
 
-			feature[8] = harvardInquirerFeature.isContainsPositiveWord() ? 1.0 : 0.0;
-			feature[9] = harvardInquirerFeature.isContainsNegativeWord() ? 1.0 : 0.0;
-			feature[10] = harvardInquirerFeature.isContainsHostileWord() ? 1.0 : 0.0;
-			feature[11] = harvardInquirerFeature.isContainsFailWord() ? 1.0 : 0.0;
-			feature[12] = harvardInquirerFeature.isContainsActiveWord() ? 1.0 : 0.0;
-			feature[13] = harvardInquirerFeature.isContainsPassiveWord() ? 1.0 : 0.0;
-			feature[14] = harvardInquirerFeature.isContainsPleasureWord() ? 1.0 : 0.0;
-			feature[15] = harvardInquirerFeature.isContainsPainWord() ? 1.0 : 0.0;
-			feature[16] = harvardInquirerFeature.isContainsStrongWord() ? 1.0 : 0.0;
-			feature[17] = harvardInquirerFeature.isContainsWeakWord() ? 1.0 : 0.0;
-			feature[18] = harvardInquirerFeature.isContainsVirtueWord() ? 1.0 : 0.0;
-			feature[19] = harvardInquirerFeature.isContainsViceWord() ? 1.0 : 0.0;
-			feature[20] = ef.getNegativeEmoticonScore(tweetData);
-			feature[21] = ef.getNeutralEmoticonScore(tweetData);
-			feature[22] = ef.getPositiveEmoticonScore(tweetData);
+			feature[featureIndex++] = harvardInquirerFeature.isContainsPositiveWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsNegativeWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsHostileWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsFailWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsActiveWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsPassiveWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsPleasureWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsPainWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsStrongWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsWeakWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsVirtueWord() ? 1.0 : 0.0;
+			feature[featureIndex++] = harvardInquirerFeature.isContainsViceWord() ? 1.0 : 0.0;
+			
+			feature[featureIndex++] = ef.getNegativeEmoticonScore(tweetData);
+			feature[featureIndex++] = ef.getNeutralEmoticonScore(tweetData);
+			feature[featureIndex++] = ef.getPositiveEmoticonScore(tweetData);
 
-			double[] labelArray = new double[1];
+			double[] labelArray = new double[NUMBER_OF_OUTPUTS];
 			if (tweetData.isBullying()) {
 				labelArray[0] = 1.0;
-			}
-//            else {
-//                labelArray[1] = 1.0;
-//            }
+			} else if (!tweetData.isBullying() && NUMBER_OF_OUTPUTS > 1){
+                labelArray[1] = 1.0;
+            }
 
 			dataSet.add(new BasicMLData(feature), new BasicMLData(labelArray));
 		}

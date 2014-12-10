@@ -29,7 +29,8 @@ public class EmoticonFeature {
 		int score = 0;
 		for (String emoticon : efe.negativeEmoticons.keySet()) {
 			if (tweet.getTweet().contains(emoticon)) {
-				score++;
+//				score++;
+			    return 1;
 			}
 		}
 		return score;
@@ -44,7 +45,8 @@ public class EmoticonFeature {
 		int score = 0;
 		for (String emoticon : efe.neutralEmoticons.keySet()) {
 			if (tweet.getTweet().contains(emoticon)) {
-				score++;
+//				score++;
+			    return 1;
 			}
 		}
 		return score;
@@ -59,7 +61,8 @@ public class EmoticonFeature {
 		int score = 0;
 		for (String emoticon : efe.positiveEmoticons.keySet()) {
 			if (tweet.getTweet().contains(emoticon)) {
-				score++;
+//				score++;
+			    return 1;
 			}
 		}
 		return score;

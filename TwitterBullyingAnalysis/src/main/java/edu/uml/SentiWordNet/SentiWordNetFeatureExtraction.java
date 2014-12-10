@@ -31,14 +31,19 @@ public class SentiWordNetFeatureExtraction {
         
         double sumPositiveScore = 0.0;
         double sumNegativeScore = 0.0;
+        double sumObjectiveScore = 0.0;
+        
         int nonZeroPositiveCount = 0;
         int nonZeroNegativeCount = 0;
+        int nonZeroObjectiveCount = 0;
         
         double sumPositiveAdjectiveScore = 0.0;
         double sumNegativeAdjectiveScore = 0.0;
+        double sumObjectiveAdjectiveScore = 0.0;
         
         int nonZeroPositiveAdjectiveCount = 0;
         int nonZeroNegativeAdjectiveCount = 0;
+        int nonZeroObjectiveAdjectiveCount = 0;
         
         List<TaggedToken> tagged = tagger.tokenizeAndTag(s);
         
@@ -48,20 +53,24 @@ public class SentiWordNetFeatureExtraction {
                 wordCount++;
                 sumPositiveScore += entry.getPositiveScore();
                 sumNegativeScore += entry.getNegativeScore();
+                sumObjectiveScore += entry.getObjectiveScore();
                 
                 if(entry.getPositiveScore() > 0.0) nonZeroPositiveCount++;
                 if(entry.getNegativeScore() > 0.0) nonZeroNegativeCount++;
+                if(entry.getObjectiveScore() > 0.0) nonZeroObjectiveCount++;
 
                 if(taggedToken.tag.equals("A")) {
                     sumPositiveAdjectiveScore += entry.getPositiveScore();
                     sumNegativeAdjectiveScore += entry.getNegativeScore();
+                    sumObjectiveAdjectiveScore += entry.getObjectiveScore();
                     
                     if(entry.getPositiveScore() > 0.0) nonZeroPositiveAdjectiveCount++;
                     if(entry.getNegativeScore() > 0.0) nonZeroNegativeAdjectiveCount++;
+                    if(entry.getObjectiveScore() > 0.0) nonZeroObjectiveAdjectiveCount++;
                 }
             }
         }
         
-        return new SentiWordNetFeature(wordCount, sumPositiveScore, sumNegativeScore, nonZeroPositiveCount, nonZeroNegativeCount, sumPositiveAdjectiveScore, sumNegativeAdjectiveScore, nonZeroPositiveAdjectiveCount, nonZeroNegativeAdjectiveCount);
+        return new SentiWordNetFeature(wordCount, sumPositiveScore, sumNegativeScore, sumObjectiveScore, nonZeroPositiveCount, nonZeroNegativeCount, nonZeroObjectiveCount, sumPositiveAdjectiveScore, sumNegativeAdjectiveScore, sumObjectiveAdjectiveScore, nonZeroPositiveAdjectiveCount, nonZeroNegativeAdjectiveCount, nonZeroObjectiveAdjectiveCount);
     }
 }
