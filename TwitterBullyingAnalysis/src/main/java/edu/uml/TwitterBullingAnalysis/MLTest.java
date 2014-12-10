@@ -62,7 +62,7 @@ public class MLTest {
 		ArrayList<TwitterData> testingTweets = new ArrayList<>();
 
 		List<TwitterData> allTweets = new ArrayList<>();
-		allTweets = DataParser.parseData("../Corpus/gold/tweets-annotated.txt");
+		allTweets = DataParser.parseData("../Corpus/gold/tweets-annotated-large.txt");
 		splitData(allTweets, trainingTweets, testingTweets);
 
 		// Set up machine learning
