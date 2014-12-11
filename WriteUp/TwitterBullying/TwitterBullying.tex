@@ -60,16 +60,14 @@ For a tweet to be cleanly identified by a computer as being bullying it must hav
 %   c. related work section, describing relevant results from other people's efforts to solve this problem
 %   We probobly could have done more research before beginning but oh well.
 %   I found a few related items and publications at the website below.
-\paragraph{}
+\paragraph{WSIC}
 % http://research.cs.wisc.edu/bullying/publications.html
-Two years ago, the University of Wisconsin completed a project on the study of bullying in Twitter that heralded lots of media coverage, including several articles from \textit{The Huffington Post} and \textit{Time Magazine}. The University of Wisconsin's code used a set of static words as search terms for tweets, then classified them based on a very small pre-existing bullying model. This model did yield some results but the efficacy left much to be desired. The first version of the University's code was made public that same year the project was released and our project has improved on their initial algorithm. 
+Two years ago, the University of Wisconsin completed a project on the study of bullying in Twitter that heralded lots of media coverage, including several articles from \textit{The Huffington Post} and \textit{Time Magazine}. The University of Wisconsin's code used a set of static words as search terms for tweets, then classified the tweets using a very small pre-existing bullying model. This model did yield some results but the efficacy left much to be desired. The first version of the University's code was made public and can easily be seen that it is quite primitive by comparison to our project. Unfortunately, the university didn’t release the data sets that they used for the projects so the reported results could not be confirmed.
 
-\paragraph{}
-% http://pages.cs.wisc.edu/~jerryzhu/pub/wisdom12.pdf
-
-\paragraph{}
+\paragraph{Psychology}
 % talk about bullying from a psycological perspective
 % http://extension.fullerton.edu/professionaldevelopment/assets/pdf/bullying/sticks_and_stones.pdf
+This project required looking at bullying through many different lenses. To be able to identify bullies you need to be able to understand them from a psychological standpoint. The paper \textit{Sticks and Stones Can Break My Bones, But How Can Pixels Hurt Me?} ~\cite{PixelsHurtMe} suggests that youth today have adopted a new type of bullying through social media. This new form of electronic communication makes it much easier for young users to say things that they would not normally say in person. Often times users will have a completely different persona online than in person.
 
 
 
@@ -98,9 +96,20 @@ The final stage of building the data set for this project is manual tagging. Aft
 
 \section{Results}
 %   f. description of your results.
+\paragraph{Machine Learning}
+\paragraph{Corpus}
+Constructing the corpus was a multi step process which had varying results at each step. First, seed word collection from the existing lexicon yielded just under 2500 words. After manual review some interesting words came back such as ipad2 which had a negative sentiment score of -4.999. After feeding the 2500 words into the twitter search algorithm we ended up with just under 25000 tweets to be analysed. As of this writing we have managed to manually tag almost 4000 tweets giving us a tagging accuracy of around 30\%. This is an improvement from using only 700 tweets and seeing only 20\% accuracy. With more tagged tweets we expect to see additional improvement.
 
 \section{Future Improvements}
 %   g. discussion of results, conclusions of your study, future directions for this work
+\paragraph{Non Binary Classifier}
+This project only trains a binary classifier for bullying. Unfortunately, bullying is a complex issue and has many more parts than just bullying and not bullying. Often, someone who may appear to be a bully is simply reporting that someone else is a bully. Additionally, users who are bullies often have others who support them but who they themselves are not actually bullies. For this reason it is logical to improve the classifier to include tags for supporters, victims, bullies, and reporters. 
+\paragraph{Confirmation}
+One advancement that can be made for this project is to add another layer of evaluation known as confirmation. This next layer would take the list of tweets which had been tagged as bullying by the initial evaluation and run them though another algorithm. This algorithm will then search for only that particular users tweets an run those through the analyser as well. If the second analysis comes back with several more bullying tweets then we can confirm that this person is a bully. This would improve on the fact that occasionally people have a bad day and post negative things online. However, if someone is doing it all the time it gives us proof that this person is a bully.
+\paragraph{Emojis}
+Twitter now has support for iPhone Emojis. Emojis are similar to emoticons but they are far more expressive than simple smile and frown faces. They use a format similar to html symbols using a unique unicode table representing faces and actions. Having a feature which could take into account the sentiment of Emojis would be a significant improvement to this project.
+\paragraph{Seed Words}
+Although the list of potential bullying words that are in use for this project is large it is still static. As bullying progresses in social media so does the associated vernacular. A feature which would improve the searching algorithm is one that will identify new seed words for future searches in the tweets which have been classified as bullying.
 
 % Cross verification using users older tweets
 % Additional features more unique to bullying

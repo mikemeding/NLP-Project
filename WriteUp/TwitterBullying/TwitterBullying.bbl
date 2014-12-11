@@ -3,5 +3,10 @@
 \bibitem{SentiBullying}
 {Jun-Ming Xu, Xiaojin Zhu, Amy Bellmore}.
 \newblock Fast learning for sentiment analysis on bullying.
+\newblock pages.cs.wisc.edu/\~jerryzhu/pub/wisdom12.pdf.
+
+\bibitem{PixelsHurtMe}
+{Wanda Cassidy, Margaret Jackson, and Karen N. Brown}.
+\newblock Sticks and stones can break my bones, but how can pixels hurt me?
 
 \end{thebibliography}

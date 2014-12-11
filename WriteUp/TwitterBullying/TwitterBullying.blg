@@ -3,46 +3,46 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: TwitterBullying.aux
 The style file: plain.bst
 Database file #1: References.bib
-Warning--empty note in SentiBullying
-You've used 1 entry,
+Warning--empty note in PixelsHurtMe
+You've used 2 entries,
             2118 wiz_defined-function locations,
-            503 strings with 4215 characters,
-and the built_in function-call counts, 186 in all, are:
-= -- 16
-> -- 7
+            508 strings with 4483 characters,
+and the built_in function-call counts, 356 in all, are:
+= -- 34
+> -- 14
 < -- 0
-+ -- 3
-- -- 2
-* -- 10
-:= -- 43
-add.period$ -- 2
-call.type$ -- 1
-change.case$ -- 4
++ -- 6
+- -- 4
+* -- 15
+:= -- 79
+add.period$ -- 5
+call.type$ -- 2
+change.case$ -- 8
 chr.to.int$ -- 0
-cite$ -- 2
-duplicate$ -- 6
-empty$ -- 12
-format.name$ -- 2
-if$ -- 31
+cite$ -- 3
+duplicate$ -- 12
+empty$ -- 23
+format.name$ -- 4
+if$ -- 63
 int.to.chr$ -- 0
-int.to.str$ -- 1
+int.to.str$ -- 2
 missing$ -- 0
-newline$ -- 7
-num.names$ -- 2
-pop$ -- 4
+newline$ -- 12
+num.names$ -- 4
+pop$ -- 7
 preamble$ -- 1
-purify$ -- 3
+purify$ -- 6
 quote$ -- 0
-skip$ -- 4
+skip$ -- 8
 stack$ -- 0
-substring$ -- 5
+substring$ -- 10
 swap$ -- 0
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 4
+type$ -- 8
 warning$ -- 1
-while$ -- 2
-width$ -- 2
-write$ -- 9
+while$ -- 4
+width$ -- 3
+write$ -- 18
 (There was 1 warning)
