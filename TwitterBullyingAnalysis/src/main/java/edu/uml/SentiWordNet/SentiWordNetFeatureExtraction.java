@@ -48,7 +48,10 @@ public class SentiWordNetFeatureExtraction {
         List<TaggedToken> tagged = tagger.tokenizeAndTag(s);
         
         for(TaggedToken taggedToken: tagged) {
-            List<SentiWordNetEntry> entries = sentiWordNet.getSentiWordNetEntries(arkTweetNLPTagToSentiWordNetTag.get(taggedToken.tag), taggedToken.token.toLowerCase());
+            
+            String token = taggedToken.token.toLowerCase().replace("#", "");
+            
+            List<SentiWordNetEntry> entries = sentiWordNet.getSentiWordNetEntries(arkTweetNLPTagToSentiWordNetTag.get(taggedToken.tag), token);
             for(SentiWordNetEntry entry: entries) {
                 wordCount++;
                 sumPositiveScore += entry.getPositiveScore();

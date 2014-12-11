@@ -34,8 +34,10 @@ public class HarvardInquirerFeatureExtraction {
 
         for (TaggedToken taggedToken : tagged) {
 
-            for (Map<String, String> entry : harvardInquirer.getEntriesForWord(taggedToken.token
-                    .toLowerCase())) {
+            String token = taggedToken.token.toLowerCase().replace("#", "");
+            
+            for (Map<String, String> entry : harvardInquirer.getEntriesForWord(token)) {
+                
                 if (hasTag(taggedToken.tag, entry)) {
 
                     // http://www.wjh.harvard.edu/~inquirer/homecat.htm
