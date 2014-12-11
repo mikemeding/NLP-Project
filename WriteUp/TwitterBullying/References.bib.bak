@@ -1,0 +1,6 @@
+@unpublished{SentiBullying,
+   author    = "{Jun-Ming Xu, Xiaojin Zhu, Amy Bellmore}",
+   title     = "Fast Learning for Sentiment Analysis on Bullying", 
+   institution    = "University of Wisconsin-Madison",
+   howpublished = "\url{http://pages.cs.wisc.edu/~jerryzhu/pub/wisdom12.pdf}",
+}
