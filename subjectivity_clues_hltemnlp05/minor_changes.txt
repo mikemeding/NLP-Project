@@ -1,0 +1,5 @@
+http://mpqa.cs.pitt.edu/lexicons/subj_lexicon/
+
+lugubrious had stemmed = 1 so it was changed to y
+pervasive had and extra field m and that was removed
+boast had both positive and negative so it was changed to be both for polarity
