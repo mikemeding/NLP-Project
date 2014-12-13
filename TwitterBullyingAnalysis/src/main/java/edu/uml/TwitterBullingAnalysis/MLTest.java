@@ -79,9 +79,9 @@ public class MLTest {
 
         // Parse all data sets
         List<TwitterData> allTweets = new ArrayList<>();
-        allTweets.addAll(DataParser.parseData("../Corpus/gold/tweets-annotated-large.txt"));
+        allTweets.addAll(DataParser.parseData("../Corpus/gold/combined.txt"));
         allTweets.addAll(DataParser.parseData("../Corpus/gold/tweets-annotated.txt"));
-        allTweets.addAll(DataParser.parseData("../Corpus/gold/bullying-tweets.txt"));
+//        allTweets.addAll(DataParser.parseData("../Corpus/gold/bullying-tweets.txt"));
         removeDuplicateTweets(allTweets);
         
         splitData(allTweets, trainingTweets, testingTweets);
