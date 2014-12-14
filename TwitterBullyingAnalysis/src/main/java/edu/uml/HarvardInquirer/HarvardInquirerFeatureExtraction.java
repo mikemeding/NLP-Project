@@ -8,6 +8,9 @@ import cmu.arktweetnlp.Tagger.TaggedToken;
 
 public class HarvardInquirerFeatureExtraction {
 
+    public static final String[] CATEGORIES_TO_lOOK_FOR = "Positiv Negativ Pstv Affil Ngtv Hostile Strong Power Weak Submit Active Passive Pleasur Pain Feel Arousal EMOT Virtue Vice Ovrst Undrst Academ Doctrin Econ@ Exch ECON Exprsv Legal Milit Polit@ POLIT Relig Role COLL Work Ritual SocRel Race Kin@ MALE Female Nonadlt HU ANI PLACE Social Region Route Aquatic Land Sky Object Tool Food Vehicle BldgPt ComnObj NatObj BodyPt ComForm COM Say Need Goal Try Means Persist Complet Fail NatrPro Begin Vary Increas Decreas Finish Stay Rise Exert Fetch Travel Fall Think Know Causal Ought Perceiv Compare Eval@ EVAL Solve Abs@ ABS Quality Quan NUMB ORD CARD FREQ DIST Time@ TIME Space POS DIM Rel COLOR Self Our You Name Yes No Negate Intrj IAV DAV SV IPadj IndAdj PowGain PowLoss PowEnds PowAren PowCon PowCoop PowAuPt PowPt PowDoct PowAuth PowOth PowTot RcEthic RcRelig RcGain RcLoss RcEnds RcTot RspGain RspLoss RspOth RspTot AffGain AffLoss AffPt AffOth AffTot WltPt WltTran WltOth WltTot WlbGain WlbLoss WlbPhys WlbPsyc WlbPt WlbTot EnlGain EnlLoss EnlEnds EnlPt EnlOth EnlTot SklAsth SklPt SklOth SklTot TrnGain TrnLoss TranLw MeansLw EndsLw ArenaLw PtLw Nation Anomie NegAff PosAff SureLw If NotLw TimeSpc FormLw".split(" ");
+//    public static final String[] CATEGORIES_TO_lOOK_FOR = "Positiv Negativ Hostile Strong Power Weak Active Passive Pleasur Pain Virtue Vice Ovrst Undrst Race".split(" ");
+
     private Tagger tagger;
     private HarvardInquirer harvardInquirer;
 
@@ -15,58 +18,28 @@ public class HarvardInquirerFeatureExtraction {
         this.tagger = tagger;
         this.harvardInquirer = harvardInquirer;
     }
-
-    public HarvardInquirerFeature extractFeatures(String tweet) {
+    
+    public double[] extractFeatures(String tweet) {
         List<TaggedToken> tagged = tagger.tokenizeAndTag(tweet);
-
-        boolean containsPositiveWord = false;
-        boolean containsNegativeWord = false;
-        boolean containsHostileWord = false;
-        boolean containsFailWord = false;
-        boolean containsActiveWord = false;
-        boolean containsPassiveWord = false;
-        boolean containsPleasureWord = false;
-        boolean containsPainWord = false;
-        boolean containsStrongWord = false;
-        boolean containsWeakWord = false;
-        boolean containsVirtueWord = false;
-        boolean containsViceWord = false;
-
+        
+        double[] features = new double[CATEGORIES_TO_lOOK_FOR.length];
+        
         for (TaggedToken taggedToken : tagged) {
-
             String token = taggedToken.token.toLowerCase().replace("#", "");
-            
             for (Map<String, String> entry : harvardInquirer.getEntriesForWord(token)) {
-                
                 if (hasTag(taggedToken.tag, entry)) {
-
-                    // http://www.wjh.harvard.edu/~inquirer/homecat.htm
-                    if (entry.containsKey("Positiv")) containsPositiveWord = true;
-                    if (entry.containsKey("Negativ")) containsNegativeWord = true;
-
-                    if (entry.containsKey("Hostile")) containsHostileWord = true;
-                    if (entry.containsKey("Fail")) containsFailWord = true;
-
-                    if (entry.containsKey("Active")) containsActiveWord = true;
-                    if (entry.containsKey("Passive")) containsPassiveWord = true;
-
-                    if (entry.containsKey("Pleasur")) containsPleasureWord = true;
-                    if (entry.containsKey("Pain")) containsPainWord = true;
-
-                    if (entry.containsKey("Strong")) containsStrongWord = true;
-                    if (entry.containsKey("Weak")) containsWeakWord = true;
-
-                    if (entry.containsKey("Virtue")) containsVirtueWord = true;
-                    if (entry.containsKey("Vice")) containsViceWord = true;
+                    for(int index = 0; index < CATEGORIES_TO_lOOK_FOR.length; index++) {
+                        if(entry.containsKey(CATEGORIES_TO_lOOK_FOR[index])) {
+                            features[index] = 1.0;
+                        }
+                    }
                 }
             }
         }
-
-        return new HarvardInquirerFeature(containsPositiveWord, containsNegativeWord,
-                containsHostileWord, containsFailWord, containsActiveWord, containsPassiveWord,
-                containsPleasureWord, containsPainWord, containsStrongWord, containsWeakWord,
-                containsVirtueWord, containsViceWord);
+        
+        return features;
     }
+
 
     private static boolean hasTag(String tag, Map<String, String> entry) {
 

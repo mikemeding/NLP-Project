@@ -94,6 +94,10 @@ public class SentiWordNetFeature {
     public int getNonZeroNegativeCount() {
         return nonZeroNegativeCount;
     }
+    
+    public int getNonZeroObjectiveCount() {
+        return nonZeroObjectiveCount;
+    }
 
     public double getSumPositiveAdjectiveScore() {
         return sumPositiveAdjectiveScore;

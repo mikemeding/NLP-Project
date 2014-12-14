@@ -27,9 +27,11 @@ public class SubjectiveLexiconFeatureExtractor {
         arkTweetNLPTagToSubjectiveLexiconTag.put("R", PartOfSpeech.ADVERB);
     }
 
-    public SubjectiveLexiconFeature extractFeatures(String s) {
+    public double[] extractFeatures(String s) {
         List<TaggedToken> tagged = tagger.tokenizeAndTag(s);
 
+        double[] features = new double[8];
+        
         boolean strongPositive = false;
         boolean strongNegative = false;
         boolean weakPositive = false;
@@ -92,9 +94,17 @@ public class SubjectiveLexiconFeatureExtractor {
                 }
             }
         }
+        
+        features[0] = strongPositive ? 1.0 : 0.0;
+        features[0] = strongNegative ? 1.0 : 0.0;
+        features[0] = weakPositive ? 1.0 : 0.0;
+        features[0] = weakNegative ? 1.0 : 0.0;
 
-        return new SubjectiveLexiconFeature(strongPositive, strongNegative, weakPositive,
-                weakNegative, strongPositiveAdjective, strongNegativeAdjective,
-                weakPositiveAdjective, weakNegativeAdjective);
+        features[0] = strongPositiveAdjective ? 1.0 : 0.0;
+        features[0] = strongNegativeAdjective ? 1.0 : 0.0;
+        features[0] = weakPositiveAdjective ? 1.0 : 0.0;
+        features[0] = weakNegativeAdjective ? 1.0 : 0.0;
+
+        return features;
     }
 }

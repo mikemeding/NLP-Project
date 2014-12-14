@@ -17,27 +17,22 @@ import org.encog.ml.data.basic.BasicMLDataSet;
 import org.encog.ml.train.MLTrain;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.training.propagation.back.Backpropagation;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 
 import cmu.arktweetnlp.Tagger;
 import edu.uml.ArkTweetNLP.CommonTagPatternExtractor;
-import edu.uml.EmoticonSentiment.EmoticonFeature;
 import edu.uml.EmoticonSentiment.EmoticonFeatureExtraction;
 import edu.uml.HarvardInquirer.HarvardInquirer;
-import edu.uml.HarvardInquirer.HarvardInquirerFeature;
 import edu.uml.HarvardInquirer.HarvardInquirerFeatureExtraction;
 import edu.uml.SentiWordNet.SentiWordNet;
-import edu.uml.SentiWordNet.SentiWordNetFeature;
 import edu.uml.SentiWordNet.SentiWordNetFeatureExtraction;
 import edu.uml.mpqa.SubjectiveLexicon.SubjectiveLexicon;
-import edu.uml.mpqa.SubjectiveLexicon.SubjectiveLexiconFeature;
 import edu.uml.mpqa.SubjectiveLexicon.SubjectiveLexiconFeatureExtractor;
 
 public class MLTest {
 
-    public static final int NUMBER_OF_FEATURES = 34 + 65;
-    public static final int NUMBER_OF_HIDDEN_UNITS = NUMBER_OF_FEATURES * 2;
-//    public static final int NUMBER_OF_HIDDEN_UNITS = 100;
+    public static final int NUMBER_OF_HIDDEN_UNITS = 100;
     public static final int NUMBER_OF_OUTPUTS = 2;
     public static final double TRAINING_PERCENTAGE = 0.8;
 
@@ -50,7 +45,6 @@ public class MLTest {
          */
         // emoticon lexicon extraction
         EmoticonFeatureExtraction efe = new EmoticonFeatureExtraction("emoticons.txt");
-        EmoticonFeature emoticonFeature = new EmoticonFeature(efe);
 
         // ark tweet TOKENIZER and POS TAGGER
         Tagger tagger = new Tagger();
@@ -81,43 +75,54 @@ public class MLTest {
         List<TwitterData> allTweets = new ArrayList<>();
         allTweets.addAll(DataParser.parseData("../Corpus/gold/combined.txt"));
         allTweets.addAll(DataParser.parseData("../Corpus/gold/tweets-annotated.txt"));
-//        allTweets.addAll(DataParser.parseData("../Corpus/gold/bullying-tweets.txt"));
+        allTweets.addAll(DataParser.parseData("../Corpus/gold/bullying-tweets.txt"));
         removeDuplicateTweets(allTweets);
         
         splitData(allTweets, trainingTweets, testingTweets);
+//        trainingTweets.addAll(DataParser.parseData("../Corpus/gold/combined.txt"));
+//        trainingTweets.addAll(DataParser.parseData("../Corpus/gold/bullying-tweets.txt"));
+//        testingTweets.addAll(DataParser.parseData("../Corpus/gold/tweets-annotated.txt"));
+//        removeDuplicateTweets(trainingTweets);
+//        removeDuplicateTweets(testingTweets);
+        
 
         // Set up machine learning
         BasicMLDataSet trainingData = new BasicMLDataSet();
         BasicMLDataSet testingData = new BasicMLDataSet();
 
         // Extract all our features from the given data
-        extractFeatures(swnfe, hife, emoticonFeature, slfe, ctpe, trainingTweets, trainingData);
-        extractFeatures(swnfe, hife, emoticonFeature, slfe, ctpe, testingTweets, testingData);
+        extractFeatures(swnfe, hife, efe, slfe, ctpe, trainingTweets, trainingData);
+        extractFeatures(swnfe, hife, efe, slfe, ctpe, testingTweets, testingData);
+        
+        System.out.println(trainingData.get(0).getInputArray().length + " features");
 
         int numberOfIterations = 10000;
         BasicNetwork network = new BasicNetwork();
-        network.addLayer(new BasicLayer(null, true, NUMBER_OF_FEATURES));
+        network.addLayer(new BasicLayer(null, true, trainingData.get(0).getInputArray().length));
         network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_HIDDEN_UNITS));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_HIDDEN_UNITS));
+        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_HIDDEN_UNITS / 2));
 //        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_OUTPUTS));
         network.addLayer(new BasicLayer(new ActivationSoftMax(), true, NUMBER_OF_OUTPUTS));
         network.getStructure().finalizeStructure();
         network.reset();
         MLRegression mlRegression = network;
         MLTrain train = new ResilientPropagation(network, trainingData);
+//        MLTrain train = new Backpropagation(network, trainingData);
 
         // int numberOfIterations = 1;
         // SVM method = new SVM(NUMBER_OF_FEATURES, SVMType.EpsilonSupportVectorRegression,
         // KernelType.Linear);
         // MLRegression mlRegression = method;
         // MLTrain train = new SVMTrain(method, trainingData);
-        int epoch = 1;
+        int epoch = 0;
 
         do {
             train.iteration();
-            System.out.println("Epoch #" + epoch + " Error: " + train.getError());
             epoch++;
-        } while (train.getError() > 0.0001 && epoch <= numberOfIterations);
+            if(epoch % 10 == 0) System.out.printf("Epoch #%5d \t Error: %8f \n", epoch, train.getError());
+        } while (train.getError() > 0.001 && epoch <= numberOfIterations);
+        
+        System.out.printf("Final Epoch #%5d \t Error: %8f \n", epoch, train.getError());
         train.finishTraining();
 
         System.out.println("Training Results: ");
@@ -221,7 +226,7 @@ public class MLTest {
         int numberOfNonBullyingTweetsForTraining = (int) Math.floor(TRAINING_PERCENTAGE
                 * nonBullyingTweets.size());
 
-        // int numberOfNonBullyingTweetsForTraining = numberOfBullyingTweetsForTraining;
+//         int numberOfNonBullyingTweetsForTraining = numberOfBullyingTweetsForTraining * 4;
         for (int i = 0; i < numberOfBullyingTweetsForTraining; i++) {
             trainingTweets.add(bullyingTweets.remove(0));
         }
@@ -238,73 +243,39 @@ public class MLTest {
     }
 
     public static void extractFeatures(SentiWordNetFeatureExtraction swnfe,
-            HarvardInquirerFeatureExtraction hife, EmoticonFeature ef,
+            HarvardInquirerFeatureExtraction hife, EmoticonFeatureExtraction efe,
             SubjectiveLexiconFeatureExtractor slfe, CommonTagPatternExtractor ctpe,
             ArrayList<TwitterData> tweets, BasicMLDataSet dataSet) {
 
         for (TwitterData tweetData : tweets) {
             String tweet = tweetData.getTweet();
 
-            SentiWordNetFeature sentiWordNetFeature = swnfe.extractFeatures(tweet);
-            HarvardInquirerFeature harvardInquirerFeature = hife.extractFeatures(tweet);
-            SubjectiveLexiconFeature subjectiveLexiconFeature = slfe.extractFeatures(tweet);
+            double[] sentiWordNetFeatures = swnfe.extractFeatures(tweet);
+            double[] harvardInquirerFeatures = hife.extractFeatures(tweet);
+            double[] emoticonFeatures = efe.extractFeatures(tweet);
+            double[] subjectiveLexiconFeatures = slfe.extractFeatures(tweet);
             double[] matchedPatterns = ctpe.extractFeatures(tweet);
 
-            double[] feature = new double[NUMBER_OF_FEATURES];
-            int featureIndex = 0;
+            ArrayList<Double> featureList = new ArrayList<>();
 
-            feature[featureIndex++] = sentiWordNetFeature.getAveragePositiveScore();
-            feature[featureIndex++] = sentiWordNetFeature.getAverageNegativeScore();
-            feature[featureIndex++] = sentiWordNetFeature.getAverageObjectiveScore();
+            for(double sf: sentiWordNetFeatures) {
+                featureList.add(sf);
+            }
+            
+            for(double hif: harvardInquirerFeatures) {
+                featureList.add(hif);
+            }
+            
+            for(double ef: emoticonFeatures) {
+                featureList.add(ef);
+            }
 
-            feature[featureIndex++] = sentiWordNetFeature.getNonZeroAveragePositiveScore();
-            feature[featureIndex++] = sentiWordNetFeature.getNonZeroAverageNegativeScore();
-            feature[featureIndex++] = sentiWordNetFeature.getNonZeroAverageObjectiveScore();
-
-            feature[featureIndex++] = sentiWordNetFeature.getNonZeroAveragePositiveAdjectiveScore();
-            feature[featureIndex++] = sentiWordNetFeature.getNonZeroAverageNegativeAdjectiveScore();
-            feature[featureIndex++] = sentiWordNetFeature
-                    .getNonZeroAverageObjectiveAdjectiveScore();
-
-            feature[featureIndex++] = sentiWordNetFeature.getNonZeroNegativeCount() > sentiWordNetFeature
-                    .getNonZeroPositiveCount() ? 1.0 : 0.0;
-            feature[featureIndex++] = sentiWordNetFeature.getNonZeroNegativeAdjectiveCount() > sentiWordNetFeature
-                    .getNonZeroPositiveAdjectiveCount() ? 1.0 : 0.0;
-
-            feature[featureIndex++] = harvardInquirerFeature.isContainsPositiveWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsNegativeWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsHostileWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsFailWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsActiveWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsPassiveWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsPleasureWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsPainWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsStrongWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsWeakWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsVirtueWord() ? 1.0 : 0.0;
-            feature[featureIndex++] = harvardInquirerFeature.isContainsViceWord() ? 1.0 : 0.0;
-
-            feature[featureIndex++] = ef.getNegativeEmoticonScore(tweetData);
-            feature[featureIndex++] = ef.getNeutralEmoticonScore(tweetData);
-            feature[featureIndex++] = ef.getPositiveEmoticonScore(tweetData);
-
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsStrongPositive() ? 1.0
-                    : 0.0;
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsStrongNegative() ? 1.0
-                    : 0.0;
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsWeakPositive() ? 1.0 : 0.0;
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsWeakNegative() ? 1.0 : 0.0;
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsStrongPositiveAdjective() ? 1.0
-                    : 0.0;
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsStrongNegativeAdjective() ? 1.0
-                    : 0.0;
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsWeakPositiveAdjective() ? 1.0
-                    : 0.0;
-            feature[featureIndex++] = subjectiveLexiconFeature.isContainsWeakNegativeAdjective() ? 1.0
-                    : 0.0;
+            for(double slf: subjectiveLexiconFeatures) {
+                featureList.add(slf);
+            }
             
             for(double flag: matchedPatterns) {
-                feature[featureIndex++] = flag;
+                featureList.add(flag);
             }
 
             double[] labelArray = new double[NUMBER_OF_OUTPUTS];
@@ -314,7 +285,12 @@ public class MLTest {
                 labelArray[1] = 1.0;
             }
 
-            dataSet.add(new BasicMLData(feature), new BasicMLData(labelArray));
+            double[] features = new double[featureList.size()];
+            for(int i = 0; i < featureList.size(); i++) {
+                features[i] = featureList.get(i);
+            }
+            
+            dataSet.add(new BasicMLData(features), new BasicMLData(labelArray));
         }
     }
 }

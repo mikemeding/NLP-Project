@@ -25,7 +25,48 @@ public class SentiWordNetFeatureExtraction {
         arkTweetNLPTagToSentiWordNetTag.put("R", "r"); // adverb
     }
     
-    public SentiWordNetFeature extractFeatures(String s) {
+    public double[] extractFeatures(String tweet) {
+        
+        SentiWordNetFeature swnf = createFeaturesObject(tweet);
+        
+        double[] features = new double[17];
+        int featureIndex = 0;
+        
+        features[featureIndex++] = swnf.getAveragePositiveScore();
+        features[featureIndex++] = swnf.getAverageNegativeScore();
+        features[featureIndex++] = swnf.getAverageObjectiveScore();
+
+        features[featureIndex++] = swnf.getNonZeroAveragePositiveScore();
+        features[featureIndex++] = swnf.getNonZeroAverageNegativeScore();
+        features[featureIndex++] = swnf.getNonZeroAverageObjectiveScore();
+
+        features[featureIndex++] = swnf.getNonZeroAveragePositiveAdjectiveScore();
+        features[featureIndex++] = swnf.getNonZeroAverageNegativeAdjectiveScore();
+        features[featureIndex++] = swnf.getNonZeroAverageObjectiveAdjectiveScore();
+
+        boolean possitiveMajority = swnf.getNonZeroPositiveCount() > swnf.getNonZeroNegativeCount() && swnf.getNonZeroPositiveCount() > swnf.getNonZeroObjectiveCount();
+        boolean negativeMajority = swnf.getNonZeroNegativeCount() > swnf.getNonZeroPositiveCount() && swnf.getNonZeroNegativeCount() > swnf.getNonZeroObjectiveCount();
+        boolean objectiveMajority = possitiveMajority == false && negativeMajority == false;
+        
+        features[featureIndex++] = possitiveMajority ? 1.0 : 0.0;
+        features[featureIndex++] = negativeMajority ? 1.0 : 0.0;
+        features[featureIndex++] = objectiveMajority ? 1.0 : 0.0;
+        
+        boolean possitiveAdjectiveMajority = swnf.getNonZeroPositiveAdjectiveCount() > swnf.getNonZeroNegativeAdjectiveCount() && swnf.getNonZeroPositiveAdjectiveCount() > swnf.getNonZeroObjectiveAdjectiveCount();
+        boolean negativeAdjectiveMajority = swnf.getNonZeroNegativeAdjectiveCount() > swnf.getNonZeroPositiveAdjectiveCount() && swnf.getNonZeroNegativeAdjectiveCount() > swnf.getNonZeroObjectiveAdjectiveCount();
+        boolean objectiveAdjectiveMajority = possitiveAdjectiveMajority == false && negativeAdjectiveMajority == false;
+        
+        features[featureIndex++] = possitiveAdjectiveMajority ? 1.0 : 0.0;
+        features[featureIndex++] = negativeAdjectiveMajority ? 1.0 : 0.0;
+        features[featureIndex++] = objectiveAdjectiveMajority ? 1.0 : 0.0;
+        
+        features[featureIndex++] = swnf.getNonZeroNegativeCount() > swnf.getNonZeroPositiveCount() ? 1.0 : 0.0;
+        features[featureIndex++] = swnf.getNonZeroNegativeAdjectiveCount() > swnf.getNonZeroPositiveAdjectiveCount() ? 1.0 : 0.0;
+        
+        return features;
+    }
+    
+    public SentiWordNetFeature createFeaturesObject(String s) {
         
         int wordCount = 0;
         

@@ -36,6 +36,31 @@ public class EmoticonFeatureExtraction {
 			System.exit(-1);
 		}
 	}
+	
+	public double[] extractFeatures(String tweet) {
+	    
+	    double[] features = new double[3];
+	    
+	    for (String emoticon : negativeEmoticons.keySet()) {
+            if (tweet.contains(emoticon)) {
+                features[0] = 1.0;
+            }
+        }
+	    
+        for (String emoticon : neutralEmoticons.keySet()) {
+            if (tweet.contains(emoticon)) {
+                features[1] = 1.0;
+            }
+        }
+
+        for (String emoticon : positiveEmoticons.keySet()) {
+            if (tweet.contains(emoticon)) {
+                features[2] = 1.0;
+            }
+        }
+	    
+        return features;
+	}
 
 	/**
 	 * Gets the relative file path for the given system to a file in the lexicon
