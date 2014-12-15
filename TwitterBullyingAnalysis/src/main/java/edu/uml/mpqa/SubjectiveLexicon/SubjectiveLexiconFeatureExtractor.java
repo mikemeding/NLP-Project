@@ -1,5 +1,6 @@
 package edu.uml.mpqa.SubjectiveLexicon;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,17 +31,17 @@ public class SubjectiveLexiconFeatureExtractor {
     public double[] extractFeatures(String s) {
         List<TaggedToken> tagged = tagger.tokenizeAndTag(s);
 
-        double[] features = new double[8];
-        
-        boolean strongPositive = false;
-        boolean strongNegative = false;
-        boolean weakPositive = false;
-        boolean weakNegative = false;
+        ArrayList<Double> featureList = new ArrayList<>();
 
-        boolean strongPositiveAdjective = false;
-        boolean strongNegativeAdjective = false;
-        boolean weakPositiveAdjective = false;
-        boolean weakNegativeAdjective = false;
+        int strongPositiveCount = 0;
+        int strongNegativeCount = 0;
+        int weakPositiveCount = 0;
+        int weakNegativeCount = 0;
+
+        int strongPositiveAdjectiveCount = 0;
+        int strongNegativeAdjectiveCount = 0;
+        int weakPositiveAdjectiveCount = 0;
+        int weakNegativeAdjectiveCount = 0;
 
         for (TaggedToken taggedToken : tagged) {
             PartOfSpeech tag = arkTweetNLPTagToSubjectiveLexiconTag.get(taggedToken.tag);
@@ -52,58 +53,73 @@ public class SubjectiveLexiconFeatureExtractor {
                 if (entry.isStrongSubjective()) {
 
                     if (entry.getPolarity() == Polarity.BOTH) {
-                        strongPositive = true;
-                        strongNegative = true;
+                        strongPositiveCount++;
+                        strongNegativeCount++;
                     } else if (entry.getPolarity() == Polarity.NEGATIVE) {
-                        strongNegative = true;
+                        strongNegativeCount++;
                     } else if (entry.getPolarity() == Polarity.POSITIVE) {
-                        strongPositive = true;
+                        strongPositiveCount++;
                     }
 
                     if (tag == PartOfSpeech.ADJECTIVE) {
                         if (entry.getPolarity() == Polarity.BOTH) {
-                            strongPositiveAdjective = true;
-                            strongNegativeAdjective = true;
+                            strongPositiveAdjectiveCount++;
+                            strongNegativeAdjectiveCount++;
                         } else if (entry.getPolarity() == Polarity.NEGATIVE) {
-                            strongNegativeAdjective = true;
+                            strongNegativeAdjectiveCount++;
                         } else if (entry.getPolarity() == Polarity.POSITIVE) {
-                            strongPositiveAdjective = true;
+                            strongPositiveAdjectiveCount++;
                         }
                     }
 
                 } else {
                     if (entry.getPolarity() == Polarity.BOTH) {
-                        weakPositive = true;
-                        weakNegative = true;
+                        weakPositiveCount++;
+                        weakNegativeCount++;
                     } else if (entry.getPolarity() == Polarity.NEGATIVE) {
-                        weakNegative = true;
+                        weakNegativeCount++;
                     } else if (entry.getPolarity() == Polarity.POSITIVE) {
-                        weakPositive = true;
+                        weakPositiveCount++;
                     }
 
                     if (tag == PartOfSpeech.ADJECTIVE) {
                         if (entry.getPolarity() == Polarity.BOTH) {
-                            weakPositiveAdjective = true;
-                            weakNegativeAdjective = true;
+                            weakPositiveAdjectiveCount++;
+                            weakNegativeAdjectiveCount++;
                         } else if (entry.getPolarity() == Polarity.NEGATIVE) {
-                            weakNegativeAdjective = true;
+                            weakNegativeAdjectiveCount++;
                         } else if (entry.getPolarity() == Polarity.POSITIVE) {
-                            weakPositiveAdjective = true;
+                            weakPositiveAdjectiveCount++;
                         }
                     }
                 }
             }
         }
-        
-        features[0] = strongPositive ? 1.0 : 0.0;
-        features[0] = strongNegative ? 1.0 : 0.0;
-        features[0] = weakPositive ? 1.0 : 0.0;
-        features[0] = weakNegative ? 1.0 : 0.0;
 
-        features[0] = strongPositiveAdjective ? 1.0 : 0.0;
-        features[0] = strongNegativeAdjective ? 1.0 : 0.0;
-        features[0] = weakPositiveAdjective ? 1.0 : 0.0;
-        features[0] = weakNegativeAdjective ? 1.0 : 0.0;
+        featureList.add(strongPositiveCount > 0 ? 1.0 : 0.0);
+        featureList.add(strongNegativeCount > 0 ? 1.0 : 0.0);
+        featureList.add(weakPositiveCount > 0 ? 1.0 : 0.0);
+        featureList.add(weakNegativeCount > 0 ? 1.0 : 0.0);
+
+        featureList.add(strongPositiveAdjectiveCount > 0 ? 1.0 : 0.0);
+        featureList.add(strongNegativeAdjectiveCount > 0 ? 1.0 : 0.0);
+        featureList.add(weakPositiveAdjectiveCount > 0 ? 1.0 : 0.0);
+        featureList.add(weakNegativeAdjectiveCount > 0 ? 1.0 : 0.0);
+
+        featureList.add(strongNegativeCount > strongPositiveCount ? 1.0 : 0.0);
+        featureList.add(weakNegativeCount > weakPositiveCount ? 1.0 : 0.0);
+        featureList.add(strongNegativeAdjectiveCount > strongPositiveAdjectiveCount ? 1.0 : 0.0);
+        featureList.add(weakNegativeAdjectiveCount > weakPositiveAdjectiveCount ? 1.0 : 0.0);
+        
+        featureList.add((weakNegativeCount + weakPositiveCount) > (strongNegativeCount + strongPositiveCount) ? 1.0 : 0.0);
+        featureList.add((strongPositiveCount + weakPositiveCount) > (strongNegativeCount + weakNegativeCount) ? 1.0 : 0.0);
+        featureList.add((weakNegativeAdjectiveCount + weakPositiveAdjectiveCount) > (strongNegativeAdjectiveCount + strongPositiveAdjectiveCount) ? 1.0 : 0.0);
+        featureList.add((strongPositiveAdjectiveCount + weakPositiveAdjectiveCount) > (strongNegativeAdjectiveCount + weakNegativeAdjectiveCount) ? 1.0 : 0.0);
+
+        double[] features = new double[featureList.size()];
+        for (int i = 0; i < featureList.size(); i++) {
+            features[i] = featureList.get(i);
+        }
 
         return features;
     }

@@ -17,7 +17,6 @@ import org.encog.ml.data.basic.BasicMLDataSet;
 import org.encog.ml.train.MLTrain;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
-import org.encog.neural.networks.training.propagation.back.Backpropagation;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 
 import cmu.arktweetnlp.Tagger;
@@ -100,8 +99,7 @@ public class MLTest {
         BasicNetwork network = new BasicNetwork();
         network.addLayer(new BasicLayer(null, true, trainingData.get(0).getInputArray().length));
         network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_HIDDEN_UNITS));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_HIDDEN_UNITS / 2));
-//        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_OUTPUTS));
+        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, NUMBER_OF_HIDDEN_UNITS));
         network.addLayer(new BasicLayer(new ActivationSoftMax(), true, NUMBER_OF_OUTPUTS));
         network.getStructure().finalizeStructure();
         network.reset();
@@ -109,11 +107,6 @@ public class MLTest {
         MLTrain train = new ResilientPropagation(network, trainingData);
 //        MLTrain train = new Backpropagation(network, trainingData);
 
-        // int numberOfIterations = 1;
-        // SVM method = new SVM(NUMBER_OF_FEATURES, SVMType.EpsilonSupportVectorRegression,
-        // KernelType.Linear);
-        // MLRegression mlRegression = method;
-        // MLTrain train = new SVMTrain(method, trainingData);
         int epoch = 0;
 
         do {
@@ -226,7 +219,7 @@ public class MLTest {
         int numberOfNonBullyingTweetsForTraining = (int) Math.floor(TRAINING_PERCENTAGE
                 * nonBullyingTweets.size());
 
-//         int numberOfNonBullyingTweetsForTraining = numberOfBullyingTweetsForTraining * 4;
+//        int numberOfNonBullyingTweetsForTraining = numberOfBullyingTweetsForTraining * 9;
         for (int i = 0; i < numberOfBullyingTweetsForTraining; i++) {
             trainingTweets.add(bullyingTweets.remove(0));
         }
