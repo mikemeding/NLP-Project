@@ -1,11 +1,17 @@
-@unpublished{SentiBullying,
+@misc{SentiBullying,
    author    = "{Jun-Ming Xu, Xiaojin Zhu, Amy Bellmore}",
    title     = "Fast Learning for Sentiment Analysis on Bullying", 
-   institution    = "University of Wisconsin-Madison",
+   school    = "University of Wisconsin-Madison",
    note = "pages.cs.wisc.edu/\~jerryzhu/pub/wisdom12.pdf"
 }
-@unpublished{PixelsHurtMe,
+@misc{PixelsHurtMe,
    author    = "{Wanda Cassidy, Margaret Jackson, and Karen N. Brown}",
    title     = "Sticks and Stones Can Break My Bones, But How Can Pixels Hurt Me?", 
-   institution    = "Faculty of Education, Simon Fraser University, Burnaby, BC, Canada and, School of Criminology, Simon Fraser University, Burnaby,BC, Canada"
+   school    = "Faculty of Education, Simon Fraser University, Burnaby, BC, Canada and, School of Criminology, Simon Fraser University, Burnaby,BC, Canada"
+}
+@misc{OpinionMining,
+	author		="Julia Kreutzer and Neele Witte",
+	title		="Opinion Mining Using SentiWordNet",
+	school		="Uppsala University",
+	note		="2013/14",
 }
