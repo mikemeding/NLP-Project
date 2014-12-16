@@ -35,9 +35,9 @@ public class SentiWordTest {
 
             if (split.length < 2) continue;
 
-            SentiWordNetFeature feature = featureExtraction.extractFeatures(split[1]);
+//            SentiWordNetFeature feature = featureExtraction.extractFeatures(split[1]);
 
-            printBinaryFeatures(feature, split[1]);
+//            printBinaryFeatxfce4 - mixerures(feature, split[1]);
         }
 
         br.close();

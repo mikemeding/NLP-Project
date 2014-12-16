@@ -18,17 +18,21 @@ Using Sentiment Analysis to Identify Bullying Using Twitter
 %}
     }
 
-\author{Hoanh Nguyen\\
-	    University Massachusetts Lowell\\
-	     1 University Ave\\
-	     Lowell, MA 01854, USA\\
-	    {\tt soujiroboi@gmail.com }
-	  \And
+\author{
 	Michael Meding\\
   	University Massachusetts Lowell\\
-	     1 University Ave\\
-	     Lowell, MA 01854, USA\\
-  {\tt mikeymeding@gmail.com}}
+	1 University Ave\\
+	Lowell, MA 01854, USA\\
+   {\tt mikeymeding@gmail.com}
+	\And  
+   Hoanh Nguyen\\
+	University Massachusetts Lowell\\
+	1 University Ave\\
+	Lowell, MA 01854, USA\\
+	{\tt soujiroboi@gmail.com }
+}
+
+
 
 \date{}
 
@@ -256,6 +260,47 @@ Constructing the corpus using the multi step process as described in the section
 \caption{\label{tweet-table2} ~3500 tweets confusion matrix. }
 \end{table}
 
+
+%Table showing the performance of each set of features:
+\begin{table}
+\begin{center}
+\begin{tabular}{|r|l|l|}
+\hline
+\bf Feature & \bf Precision & \bf Recall \\ 
+\hline
+
+\ SentiWordNet & 0.9032 & 0.3522 \\
+\ Harvard General Inquirer & 0.9929 & 0.8805 \\
+\ Subjectivity Lexicon & 1.0 & 0.0125 \\
+\ Emoticon & 0.0 & 0.0 \\
+\ POS patterns & 0.9935 & 0.9622 \\
+\ All & 0.9936 & 0.9874 \\
+
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{result-table2} Final machine learning results from features.}
+\end{table}
+
+%Table showing network configuration
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\bf Configuration & \bf Precision & \bf Recall \\ 
+\hline
+\ 2 layers & 0.7936 & 0.3144 \\
+\ 3 layers (100 nodes) & 0.7848 & 0.3899 \\
+\ 3 layers (200 nodes) & 0.89 & 0.5597 \\
+\ 4 layers (100 nodes each) & 0.9936 & 0.9874 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tweet-table2} Neural network configuration results. }
+\end{table}
+
+
+
 \section{Future Improvements}
 %   g. discussion of results, conclusions of your study, future directions for this work
 \begin{figure}[h!]
@@ -283,9 +328,11 @@ Twitter now has support for iPhone Emojis. Emojis are similar to emoticons but t
 \paragraph{Seed Words}
 Although the list of potential bullying words that are in use for this project is large it is still static. As bullying progresses in social media so does the associated vernacular. A feature which would improve the searching algorithm is one that will identify new seed words for future searches in the tweets which have been classified as bullying.
 
-% Cross verification using users older tweets
-% Additional features more unique to bullying
-% Improve emoticon handling and expand to emojis
+\paragraph{Misspellings}
+On the preprocessing side some one thing that might help is correcting common misspellings for words. By correcting these misspellings we may be able to find them in our lexical resources and have more features fire. A tweet is limited to 140 characters so user often shorten words and use acronyms to be able to fit their entire message. Expanding these acronyms may have a positive effect. Finally there are negating words. These words completely change the sentiment of the word or words behind them. We change sentiment values or find the opposite words to generate a more accurate sense of the tweet.
+
+\paragraph{More Lexicons}
+Finding more lexical resources to use would be a good way making more features. We did not make use of hashtags in our current implementation but hashtags can convey a lot of information. Often times a hashtag chains multiple words together. It should be possible to split these words up and calculated a sentiment score for the hashtag. For part-of-speech we took a brute force approach but clearly some patterns carry more weight. For certain patterns we could do some more analysis and provide additional data.
 
 \section*{Acknowledgments}
 We thank Alison Rose, and Uwe Meding for their contributions in annotating our data set for this project. Without their efforts this project would not have been possible.
