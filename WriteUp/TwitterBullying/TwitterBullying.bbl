@@ -5,6 +5,11 @@
 \newblock Fast learning for sentiment analysis on bullying.
 \newblock pages.cs.wisc.edu/\~jerryzhu/pub/wisdom12.pdf.
 
+\bibitem{OpinionMining}
+Julia Kreutzer and Neele Witte.
+\newblock Opinion mining using sentiwordnet.
+\newblock 2013/14.
+
 \bibitem{PixelsHurtMe}
 {Wanda Cassidy, Margaret Jackson, and Karen N. Brown}.
 \newblock Sticks and stones can break my bones, but how can pixels hurt me?

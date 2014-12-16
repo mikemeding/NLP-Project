@@ -6,7 +6,8 @@
 \usepackage{Formatting}
 \usepackage{times}
 \usepackage{latexsym}
-\usepackage{cite}
+\usepackage[square,comma,numbers,sort&compress]{natbib} % for numerical style references
+\usepackage{tabularx}
 \usepackage{graphicx}
 \setlength\titlebox{6.5cm}    % Expanding the titlebox
 \newcommand{\at}{\makeatletter @\makeatother}
@@ -53,9 +54,9 @@ Using Sentiment Analysis to Identify Bullying Using Twitter
 \paragraph{}
 What is bullying? Bullying is when a person is constantly being exposed to negative actions by another individual or group of individuals and can involve both physical and mental abuse. Some common forms of mental bullying include name calling, making threats, and spreading rumours. Since the creation of social media sites, bullying has become a problem outside of the school environment and is now considered a serious national health issue among adolescents~\cite{SentiBullying}. Bullies are using the internet as an outlet to post negative comments about someone, and unlike in a school environment, they rarely see backlash for what they post on social media sites.
 \paragraph{}
-This program identifies Twitter users who are bulling those around them. To accomplish this task, the program trains a binary classifier to decide if a single tweet is bullying or not. However, further research has shown that bullying cannot fully be defined by a simple binary "yes" or "no". Bullying, in a broad sense, can be classified into many different categories beyond that of just the bully and the victim. For example, when observing a bullying in action on Twitter, you will notice that there are a lot of supporting users who do not have anything to do directly with a given bullying situation. This leads to a large amount of ambiguity when trying to decide whether someone is a bully, defender, victim, or accuser.
+This program identifies Twitter users who are bulling those around them. To accomplish this task, the program trains a binary classifier to decide if a single tweet is bullying or not. However, further research has shown that bullying cannot fully be defined by a simple binary "yes" or "no". Bullying, in a broad sense, can be classified into many different categories beyond that of just the bully and the victim. For example, when observing a bully in action on Twitter, you will notice that there are a lot of supporting users who do not have anything to do directly with a given bullying situation. This leads to a large amount of ambiguity when trying to decide whether someone is a bully, defender, victim, or accuser.
 \paragraph{}
-For a tweet to be cleanly identified by a computer as being bullying it must have both an aggressive statement and a subject or direction towards that anger. One of the major flaws with this is that often times the subject of an aggressive tweet is implied, thus making it very difficult for a machine to identify a subject. Another problem is sarcasm. Computers cannot accurately identify sarcasm using only text and unfortunately bullies often use sarcasm. Our solution to this problem was to use an assisted machine learning algorithm. The data sets were manually annotated by a human who could only use the information contained within a given tweet to decide if that user is a bully or not. By using a brute force approach, we achieved a high accuracy when tweets directly mention a subject. Given the small data set, the annotated results were surprising.
+For a tweet to be cleanly identified by a computer as being bullying it must have both an aggressive statement and a subject or direction towards that anger. This would completes the simple bully to victim relation. One of the major flaws with this is that often times the subject of an aggressive tweet is implied, thus making it very difficult for a machine to identify a subject. Another problem is sarcasm. Computers cannot accurately identify sarcasm using only text and unfortunately bullies often use sarcasm. Our solution to this problem was to use an assisted machine learning algorithm. The data sets were manually annotated by a human who could only use the information contained within a given tweet to decide if that user is a bully or not. By using a brute force approach, we achieved a high accuracy when tweets directly mention a subject. Given the small data set, the annotated results were surprising.
 
 
 \section{Related Work}
@@ -79,8 +80,54 @@ This project required looking at bullying through many different lenses. To be a
 %       - data sets used in the study,
 %       - experimental setup and and evaluation methods;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEATURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Machine Learning Methods}
 %       - machine learning methods, 
+\paragraph{Overview}
+The machine learning method that we chose for this program is called an artificial neural network. Artificial neural networks were inspired by biological neural networks and are used to approximate functions. They take in some input and produce an output. Each input is effectively a neuron, and when these neurons are activated they pass information to another set of neurons. Like other machine learning algorithms an artificial neural network can learn from data. They are part of a class of machine learning algorithms called supervised learning algorithms, which means that we need more than raw data, the data must be annotated. The algorithm will take the data and learn how to map the input to the correct output. In our case it will learn how to take a tweet and classify it as being bullying or not bullying.
+\paragraph{}
+As with any function, bad inputs produce bad outputs. Tweets in their raw form aren't exactly machine readable. We need to translate it into something our artificial neural network can use as input. What we need to do is extract features from a tweet so that we can feed them to the learning algorithm. Aside from making the input we also have to decide on the configuration of the network and how it learns. Finally we needed to test our artificial neural network to make sure it works on data that it has never seen to see if it has learned what bullying tweets look like instead of over fitting our training data.
+
+\paragraph{}
+We crafted a number of features with the help of Ark Tweet NLP, SentiWordNet, the Harvard General Inquirer, and the Subjectivity Lexicon from the University of Pittsburgh. Ark Tweet NLP is a project from Carnegie Mellon that provides a tokenizer, a part-of-speech tagger, hierarchical word clusters, and a dependency parser for tweets. SentiWordNet is a lexical resource which contains a number of entries with three sentiment scores (Positive, Negative, and Objective). The Harvard General Inquirer is another lexical resource but instead of scores each entry has a number of categories it can be a member of. The Subjectivity Lexicon contains entries and provide the strength of the subjectivity and polarity.
+
+\paragraph{Ark Tweet NLP}
+What we wanted to do was classify a tweet as bullying or not bullying by looking at word sense and the structure of the tweet rather than the words that were actually in them. One of the first things we needed to do in order to extract features from a tweet is to tokenize and get the part-of-speech for each token. Ark Tweet NLP was created to handle tweets and has twitter specific tags for things such as hashtags, at-mentions, and emoticons among other things. The tokens along with their tags become the basis for just about every feature that we built.
+
+\paragraph{SentiWordNet}
+
+%%% SentiWordNet corpus example table %%%
+\begin{table}
+\begin{center}
+\begin{tabularx}{183pt}{|c|c|c|c|}
+\hline
+\bf POS & \bf P & \bf N & \bf Term \\ 
+\hline
+\ n & 0 & 0.5 & spoiler\#1 \\
+\ n & 0.125 & 0.125 & supermodel\#1 \\
+\ n & 0.375 & 0.25 & swaggerer\#1 \\
+\ n & 0 & 0.5 & affinity\#2 \\
+\hline
+\end{tabularx}
+\end{center}
+\caption{\label{sentiword-table} ~SentiWordNet corpus example. Glossary and ID removed due to size restriction. }
+\end{table}
+
+Initially we had planned to find bullying tweets solely with sentiment analysis, so our first feature made use of SentiWordNet. Each SentiWordNet entry contains five explicit attributes (part-of-speech, id, positive score, negative score, synset terms, and glossary) and an implicit attribute (objective which is 1 - positive score - negative score) as seen in Table~\ref{sentiword-table}. A word may have multiple entries. Since we have no way of disambiguating entries we went with a naive approach and added up all scores where the entries contained the word and had the same part-of-speech tag.
+\paragraph{}
+The first few features we implemented were scores divided by entry count and if there are more negative entries than positive entries. Unfortunately those features by themselves were not able to classify a tweet as being bullying or not bullying. Then we came across a paper called Opinion Mining Using SentiWordNet~\cite{OpinionMining}. In the paper they made a number of interesting points. One thing they did was average by using non-zero score counts. Another thing in the paper we took note of was the claim "adjectives are the group of words that carry the most notions of sentiment" which appears to make a lot of sense. Also they made use of majority counts. So we implemented scores divided by non-zero score entry count, scores for adjectives divided by non-zero score entry count, and binary features for majority counts. Since we figured objectivity would usually have the majority we added two more binary that check if there are more negative counts than positive counts and the adjective only version of it.
+\paragraph{}
+Using sentiment scores only gave us a hand full of features and those features by themselves were nowhere near enough to help use classify tweets as bullying or not. We knew that we needed more features. Feeling like we had exhausted what we could from sentiment scores we looked for other potential lexical resource.
+
+\paragraph{Harvard Inquirer}
+The next set of features we created leveraged the Harvard General Inquirer. This lexical resource does not provide scores but it did mark which categories an entry belonged to. So the features that we implemented using this resource was a number of binary features that would say if the entire tweet contained a word that was contained in a specific category. The General inquirer has 182 categories so we picked out a few categories that might be able to classify tweets that are bullying and not bullying. We started with positive, negative, hostile, fail, active, and passive. These features seemed to help discriminate tweets so we continued to use more categories until we simply decided to use all the categories.
+\paragraph{}
+After that we took a look at the Subjectivity Lexicon which gives the strength of the subjectivity and polarity for each of its entries. There were two values for strength (strong and weak) and two values for polarity (positive and negative) which means there are four permutations. With that we created two sets of binary features, one set looks at all words in a tweet and the other set looks at only adjectives. A set of binary features were made to compare the number of negative polarity counts to positive polarity counts and another was designed to compare the total number of weak counts to strong counts and negative counts to positive counts.
+
+\paragraph{Pattern Recognition}
+In addition to Harvard Inquirer we created set of features that looked at the patterns of part-of-speech tags in the tweets. We discovered the patterns by using n-grams, specifically bigrams and trigrams. Next we calculated how often a pattern appeared in both the bullying and non-bullying tweets and decided to keep patterns that showed up more than ten percent of the time in either the bullying or non-bullying tweets. This turned into a large number of binary features that shows whether or not a specific pattern exists in a tweet or not.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DATA SETS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Data Sets}
 %       - data sets used in the study,
 \paragraph{Overview}
@@ -126,20 +173,23 @@ The data for this project was gathered by a data mining algorithm. The algorithm
 \end{table}
 
 This project included several lexicons which were used to develop some features. The unigram hashtag sentiment lexicon was used for the generation of aggressive search terms in order to achieve the best potential for bullying tweets. The lexicon was organized into four different categories: term, sentiment score, positive count, and negative count shown in Table~\ref{seedword-table}. Positive and negative counts were calculated from the number of times that the term co-occurred with another matching positive or negative marker. The lexicon was pre-compiled over a large amount of twitter data to give good sentiment scores. Table~\ref{seedword-table} represents the structure of the data as it exists in the file. This data was supplied by external resources and was compiled for use with Twitter related Sentiment projects. From this data we only cared about the terms which related to negative sentiment or those with a sentiment score below -4. This threshold value was adjusted to control the resulting seed word array as the lower the threshold sentiment score the less and less words would fit into that category. 
-Another useful lexicon for this project was the emoticon lexicon. This included emoticons such as :D and :( and their related sentiment in 3 categories: positive, negative, and neutral. Each of these categories was used as a feature in the identification of a bully. Unfortunately, this did not result in any significant change in accuracy as tweets that were manually classified as bullying would often include emoticons which related to positive sentiment skewing the results.
+Another useful lexicon for this project was the emoticon lexicon. This included emoticons such as :D and :( and their related sentiment in 3 categories: positive, negative, and neutral as seen in Table~\ref{emoticon-table}. Each of these categories was used as a feature in the identification of a bully. Unfortunately, this did not result in any significant change in accuracy as tweets that were manually classified as bullying would often include emoticons which related to positive sentiment skewing the results.
 
 \paragraph{Corpus}
 After going through the lexicon of negative sentiment words we end up with an array of negative words. This array now represents our search terms. Using the Twitter API, the program queries the top 40 English tweets one at a time for each word in the array of negative words. We are limited to a maximum of 40 tweets per request and 180 requests every 15 minutes. After each request has finished, the received tweets are filtered for relevancy and appended into an untagged corpus text file which is then ready for the final stage of corpus construction.
 
 \paragraph{Annotation}
-The final stage of building the data set for this project is manual tagging. After exhausting the array of negative search words, we end up with a large file of tweets which have a high potential of being tagged bullying due to the large amount of negative words. As this program uses an assisted machine learning algorithm, it requires a basis of comparison to verify the tagging efficacy. Therefore, it is required for someone to manually go through each tweet and tag each as either bullying or not\_bullying. This, as you can imagine, is exceptionally time consuming and has required the combined efforts of Alison Rose, Uwe Meding, and Michael Meding.
+The final stage of building the data set for this project is manual tagging. After exhausting the array of negative search words, we end up with a large file of tweets which have a high potential of being tagged bullying due to the large amount of negative words. As this program uses an assisted machine learning algorithm, it requires a basis of comparison to verify both if the tag chosen is correct and for the model to have data to learn from. Therefore, it is required for someone to manually go through each tweet and tag each as either bullying or not\_bullying. This, as you can imagine, is exceptionally time consuming and has required the combined efforts of Alison Rose, Uwe Meding, and Michael Meding.
  
-\subsection{Evaluation}
-%       - experimental setup and and evaluation methods;
-
-\section{Results}
+ 
+\section{Evaluation and Results}
 %   f. description of your results.
 \paragraph{Machine Learning}
+While we were designing our features we were tweaking the configuration of our artificial neural network. We chose to go with an artificial neural network over other machine learning algorithms, such as support vector machines, because of its flexibility. Instead of building the artificial neural network ourselves we used a library called Encog Machine Learning Framework. 
+\paragraph{}
+At first the network was configured to have two layers, input and output, and we quickly found out that was not enough to classify our dataset. Using our full set of features the two layer configuration was able to achieve high precision but low recall. Even before splitting the data into training and testing we knew that this configuration would not work. Next we added a hidden layer with one hundred nodes. The precision dipped a bit and recall went up a little bit. Then we changed it to two hundred nodes and both precision and recall were similar to one hundred nodes but it took significantly longer to train. Finally we added another layer with one hundred nodes and we got extremely high precision and recall. So this is the configuration we decided to stick with. While we were trying different configurations we also tried two different training methods. The methods were backpropagation and resilient propagation. Both had similar results but resilient propagation appeared to converge faster than backpropagation.
+\paragraph{}
+Testing, unfortunately, did not go nearly as well as we had hoped. Since our dataset isn't very large we had to segment our data into a training set and a testing set. We tried using a few different distributions making sure we had the same ratio or bullying and not bullying in both data sets. In each case the results were quite similar, low precision and low recall. The only bright point is that, despite its poor performance, it is still better than randomly guessing. Clearly it is over fitting it's training data. If we had more bullying tweets we might be able appropriately classify them.
 
 
 \paragraph{Corpus}
@@ -168,7 +218,7 @@ The final stage of building the data set for this project is manual tagging. Aft
 \caption{\label{corpus-table} ~Bullying tweet examples. (usernames shortened for clarity) }
 \end{table}
 
-Constructing the corpus was a multi step process which had varying results at each step. First, seed word collection from the existing lexicon yielded just under 2500 words using a threshold sentiment score of -4. After manual review some interesting words came back such as ipad2 which had a negative sentiment score of -4.999. After feeding the 2500 words into the twitter search algorithm we ended up with just under 25000 tweets to be analysed. As of this writing we have managed to manually tag almost 4000 tweets giving us a tagging accuracy of around 30\% on unseen testing data. An example of what this data looks like is shown in Table~\ref{corpus-table}. This table also showcases what this program will identify as bullying tweets. This is an improvement from training on 700 tweets and seeing less than 20\% accuracy. With more tagged tweets we expect to see additional improvement. The difference in results can be seen comparatively in Table~\ref{tweet-table} and Table~\ref{tweet-table2}. These two tables show the confusion matrix for two separate runs. One run using only 700 tweets as training data the other used 3500 tweets as training data. Resultant values are shown as counts over a smaller test corpus.
+Constructing the corpus using the multi step process as described in the sections above had results as follows, First, seed word collection from the existing lexicon yielded just under 2500 words using a threshold sentiment score of -4. Examples of this lexicon can be seen in Table~\ref{seedword-table}. After manual review some interesting words came back such as ipad2 which had a negative sentiment score of -4.999. After feeding the 2500 words into the twitter search algorithm we ended up with just under 25000 tweets to be analysed. This is a filtering drop rate of greater than 75\%. This high drop rate is a result of spamming apps and filtering useless retweets. As of this writing we have managed to manually tag almost 4000 tweets giving us a final tagging accuracy of around 30\% on unseen testing data. An example of what this data looks like is shown in Table~\ref{corpus-table}. This table also showcases what this program will identify as bullying tweets. This is an improvement from training on 700 tweets and seeing less than 20\% accuracy. With more tagged tweets we expect to see additional improvement. The difference in results can be seen comparatively in Table~\ref{tweet-table} and Table~\ref{tweet-table2}. These two tables show the confusion matrix for two separate runs. One run using only 700 tweets as training data the other used 3500 tweets as training data. Resultant values are shown as counts over a smaller test corpus.
 
 %%% 700 tweet results %%%
 %tp = 5.0, tn = 103.0, fp = 12.0, fn = 11.0
@@ -208,24 +258,28 @@ Constructing the corpus was a multi step process which had varying results at ea
 
 \section{Future Improvements}
 %   g. discussion of results, conclusions of your study, future directions for this work
-\paragraph{Non Binary Classifier}
 \begin{figure}[h!]
-\label{bully-figure} 
-  \caption{Graph of bullying and its relations.}
   \centering
-    \includegraphics[width=0.3\textwidth]{bullyDiagram}
+  \includegraphics[width=0.3\textwidth]{bullyDiagram}	
+  \caption{Graph of bullying and its relations.}
+  \label{fig:bully-figure}
 \end{figure}
-This project only trains a binary classifier for bullying. Unfortunately, bullying is a complex issue and has many more parts than just bullying and not bullying. Often, someone who may appear to be a bully is simply reporting that someone else is a bully. Additionally, users who are bullies often have others who support them but who they themselves are not actually bullies. For this reason it is logical to improve the classifier to include tags for supporters, victims, bullies, and reporters. An approach which was taken by a similar project was to attempt to construct a graphical bullying map with included bullies and victims and all supporting roles. The more complete that the graph was the higher the likelihood that bullying is occuring. A visual for this can be seen in Figure~\ref{bully-figure}~\cite{SentiBullying}.
+
+\paragraph{Non Binary Classifier}
+This project only trains a binary classifier for bullying. Unfortunately, bullying is a complex issue and has many more parts than just bullying and not bullying. Often, someone who may appear to be a bully is simply reporting that someone else is a bully. Additionally, users who are bullies often have others who support them but who they themselves are not actually bullies. For this reason it is logical to improve the classifier to include tags for supporters, victims, bullies, and reporters. An approach which was taken by a similar project was to attempt to construct a graphical bullying map with included bullies and victims and all supporting roles. The more complete that the graph was the higher the likelihood that bullying is occuring. A visual for this can be seen in Figure~\ref{fig:bully-figure}~\cite{SentiBullying}.
 \paragraph{Confirmation}
 One advancement that can be made for this project is to add another layer of evaluation known as confirmation. This next layer would take the list of tweets which had been tagged as bullying by the initial evaluation and run them though another algorithm. This algorithm will then search for only that particular users tweets an run those through the analyser as well. If the second analysis comes back with several more bullying tweets then we can confirm that this person is a bully. This would improve on the fact that occasionally people have a bad day and post negative things online. However, if someone is doing it all the time it gives us proof that this person is a bully.
-\paragraph{Emojis}
+
 \begin{figure}[h!]
-\label{emoji-figure} 
-  \caption{The difference between emoticon and emoji.}
+  %486x252 pixels
   \centering
-    \includegraphics[width=0.3\textwidth]{emoji}
+  \includegraphics[width=0.3\textwidth]{emoji}
+  \caption{The difference between emoticon and emoji.}
+  \label{fig:emoji-figure} 
 \end{figure}
-Twitter now has support for iPhone Emojis. Emojis are similar to emoticons but they are far more expressive than simple smile and frown faces as shown in Figure~\ref{emoji-figure}. They use a format similar to html symbols using a unique unicode table representing faces and actions. Having a feature which could take into account the sentiment of Emojis would be a significant improvement to this project.
+
+\paragraph{Emojis}
+Twitter now has support for iPhone Emojis. Emojis are similar to emoticons but they are far more expressive than simple smile and frown faces as shown in Figure~\ref{fig:emoji-figure}. They use a format similar to html symbols using a unique unicode table representing faces and actions. Having a feature which could take into account the sentiment of Emojis would be a significant improvement to this project.
 \paragraph{Seed Words}
 Although the list of potential bullying words that are in use for this project is large it is still static. As bullying progresses in social media so does the associated vernacular. A feature which would improve the searching algorithm is one that will identify new seed words for future searches in the tweets which have been classified as bullying.
 

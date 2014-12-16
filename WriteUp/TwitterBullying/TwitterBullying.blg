@@ -1,48 +1,46 @@
-This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2014/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: TwitterBullying.aux
 The style file: plain.bst
 Database file #1: References.bib
-Warning--empty note in PixelsHurtMe
-You've used 2 entries,
+You've used 3 entries,
             2118 wiz_defined-function locations,
-            508 strings with 4483 characters,
-and the built_in function-call counts, 356 in all, are:
-= -- 34
-> -- 14
+            514 strings with 4597 characters,
+and the built_in function-call counts, 653 in all, are:
+= -- 55
+> -- 27
 < -- 0
-+ -- 6
-- -- 4
-* -- 15
-:= -- 79
-add.period$ -- 5
-call.type$ -- 2
-change.case$ -- 8
++ -- 11
+- -- 8
+* -- 21
+:= -- 112
+add.period$ -- 8
+call.type$ -- 3
+change.case$ -- 13
 chr.to.int$ -- 0
 cite$ -- 3
-duplicate$ -- 12
-empty$ -- 23
-format.name$ -- 4
-if$ -- 63
+duplicate$ -- 21
+empty$ -- 67
+format.name$ -- 8
+if$ -- 138
 int.to.chr$ -- 0
-int.to.str$ -- 2
+int.to.str$ -- 3
 missing$ -- 0
-newline$ -- 12
-num.names$ -- 4
-pop$ -- 7
+newline$ -- 17
+num.names$ -- 6
+pop$ -- 31
 preamble$ -- 1
-purify$ -- 6
+purify$ -- 10
 quote$ -- 0
-skip$ -- 8
+skip$ -- 23
 stack$ -- 0
-substring$ -- 10
-swap$ -- 0
+substring$ -- 15
+swap$ -- 3
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 8
-warning$ -- 1
-while$ -- 4
-width$ -- 3
-write$ -- 18
-(There was 1 warning)
+type$ -- 12
+warning$ -- 0
+while$ -- 6
+width$ -- 4
+write$ -- 27
